@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Blackjack UI - Skill Edition</title>
+    <meta name="color-scheme" content="light">
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #2c3e50; color: white; margin: 0; padding: 20px; }
+        .game-area { 
+            background-color: #27ae60; 
+            padding: 20px; 
+            border-radius: 15px; 
+            width: 450px; 
+            margin: 0 auto; 
+            border: 5px solid #d4af37; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .money-info { 
+            background: rgba(0,0,0,0.4); 
+            padding: 10px; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            display: flex; 
+            justify-content: space-around;
+            font-size: 18px;
+            border: 1px solid #f1c40f;
+            font-weight: bold;
+        }
+        .hand { min-height: 120px; margin: 10px; display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; align-items: center; }
+        .card-img { 
+            width: 70px; 
+            height: auto; 
+            border-radius: 5px; 
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5); 
+            background-color: white !important; 
+            filter: none !important;
+        }
+        button { padding: 10px 20px; font-size: 16px; margin: 5px; cursor: pointer; border-radius: 5px; border: none; font-weight: bold; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+        .action-btn { background-color: #ecf0f1; color: #2c3e50; }
+        .action-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        #peek-btn { background-color: #9b59b6; color: white; }
+        #peek-btn:disabled { background-color: #555; opacity: 0.6; }
+        #next-round-btn { background-color: #f1c40f; color: #2c3e50; display: none; width: 200px; font-size: 18px; }
+        .retire-btn { background-color: #c0392b; color: white; font-size: 12px; margin-top: 20px; opacity: 0.8; }
+        #result-message { font-size: 26px; font-weight: bold; margin: 15px 0; min-height: 35px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        #start-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #start-content {
+            background: #34495e;
+            padding: 40px;
+            border-radius: 20px;
+            border: 4px solid #f1c40f;
+            max-width: 450px;
+        }
+        .rule-list { text-align: left; margin: 25px 0; font-size: 15px; line-height: 1.7; }
+        .start-btn { background: #f1c40f; color: #2c3e50; font-size: 24px; padding: 15px 50px; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="start-overlay">
+        <div id="start-content">
+            <h1 style="color: #f1c40f; margin-top: 0;">Blackjack<br>Skill Edition</h1>
+            <div class="rule-list">
+                <p>💰 <strong>初期資金:</strong> $1000</p>
+                <p>🃏 <strong>ルール:</strong> 21を超えずにディーラーより強い手を作れ！</p>
+                <p>🃏 <strong>カードの数え方:</strong><br>
+        ・【2 〜 9】は <strong>数字の通り</strong><br>
+        ・【10・J・Q・K】はすべて <strong>10点</strong> として加算<br>
+        ・【A (エース)】は <strong>最強のカード</strong>。合計が21を超えない範囲で<strong>「1」または「11」</strong>のうち、あなたに有利な方で自動計算されます。
+                <p>🔮 <strong>スキル:</strong> 透視ボタンで相手の伏せカードを確認。</p>
+                <p>⚠️ <strong>注意:</strong> 資金が底をついたらゲームオーバー！</p>
+            </div>
+            <button class="start-btn" onclick="startGame()">勝負を始める</button>
+        </div>
+    </div>
+
+    <h2 style="color: #f1c40f;">Blackjack Table</h2>
+    <div class="game-area">
+     <div class="money-info">
+    <div>💰 所持金: $<span id="balance">1000</span></div>
+    <div>
+        <span>ベッド: $</span>
+        <button onclick="changeBet(-100)" style="padding: 2px 8px; margin: 0 5px; background: #c0392b;">-</button>
+        <span id="bet">100</span>
+        <button onclick="changeBet(100)" style="padding: 2px 8px; margin: 0 5px; background: #27ae60;">+</button>
+    </div>
+</div>
+        <p>ディーラーの手札 (スコア: <span id="dealer-score">?</span>)</p>
+        <div id="dealer-hand" class="hand"></div>
+        <hr style="border: 1px dashed rgba(255,255,255,0.3);">
+        <div id="player-hand" class="hand"></div>
+        <p>あなたの手札 (スコア: <span id="player-score">0</span>)</p>
+        <div id="controls">
+            <button class="action-btn" id="hit-btn" onclick="hit()">引く</button>
+            <button class="action-btn" id="stand-btn" onclick="stand()">勝負</button>
+            <button id="peek-btn" onclick="peek()">スキル(透視)</button>
+        </div>
+        <div id="result-message"></div>
+        <button id="next-round-btn" onclick="nextRound()">次のラウンドへ</button>
+        <br>
+        <button class="retire-btn" onclick="location.reload()">リタイアしてタイトルへ</button>
+    </div>
+
+    <script src="Card.js"></script>
+    <script src="Deck.js"></script>
+    <script src="Player.js"></script>
+    <script src="main.js"></script>
+
+    <script>
+        function startGame() {
+            document.getElementById('start-overlay').style.display = 'none';
+            if(typeof initGame === 'function') initGame();
+        }
+        function nextRound() {
+            // JS側のinitGameでボタンを消す処理をしているので、ここでは関数を呼ぶだけ
+            if(typeof initGame === 'function') initGame();
+        }
+    </script>
+</body>
+</html>
