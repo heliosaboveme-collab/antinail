@@ -69,19 +69,19 @@ function judge() {
 
 // 画面を書き換える関数（HTMLとの繋ぎ込み）
 function updateDisplay(isFinished) {
-    // 自分の手札を表示
-    document.getElementById("player-hand").innerText = player.hand.join(", ");
+    // それぞれのカードを toString() で文字にしてから表示するように修正
+    document.getElementById("player-hand").innerText = player.hand.map(c => c.toString()).join(", ");
     document.getElementById("player-score").innerText = player.calculateScore();
 
-    // ディーラーの手札を表示（終了前は1枚隠す）
     if (isFinished) {
-        document.getElementById("dealer-hand").innerText = dealer.hand.join(", ");
+        document.getElementById("dealer-hand").innerText = dealer.hand.map(c => c.toString()).join(", ");
         document.getElementById("dealer-score").innerText = dealer.calculateScore();
     } else {
-        document.getElementById("dealer-hand").innerText = "???, " + dealer.hand[1];
+        // 最初の1枚を隠す演出
+        const dHand = dealer.hand.map(c => c.toString());
+        document.getElementById("dealer-hand").innerText = "???, " + dHand.slice(1).join(", ");
         document.getElementById("dealer-score").innerText = "?";
     }
 }
-
 // ページを読み込んだらゲーム開始
 window.onload = initGame;
