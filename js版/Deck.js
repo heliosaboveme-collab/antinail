@@ -4,7 +4,8 @@
 class Deck {
     constructor() {
         this.cards = [];
-        const suits = ["♥", "♦", "♠", "♣"];
+        // 🏆 修正：画像連番のルールに合わせて並び順を変更しました
+        const suits = ["♠", "♣", "♦", "♥"];
         const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
         for (let s of suits) {
