@@ -8,7 +8,7 @@ public class Blackjack {
         Player dealer = new Player();
         boolean canPeek = true; // 透視スキル使用可否
 
-        System.out.println("=== Blackjack Skill Edition (Java) ===");
+        System.out.println("=== Blackjack Skill Edition ===");
         deck.shuffle();
 
         // 初期配布
