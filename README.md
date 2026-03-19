@@ -20,3 +20,5 @@ AIの文字単位の従量課金対策として、危険度の低い判定には
 【実行動画】
 実行動画ではコメントの判定が１つ目以降判定エラーとなっていますが従課金制をオンにしていないため、無料プランの制限にひっかかっているからです。
 <video controls src="antinail.mp4" title="Title"></video>
+【実行動画外部リンク】
+https://d.kuku.lu/bvwrncwwm
